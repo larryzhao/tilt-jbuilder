@@ -22,7 +22,13 @@ module Tilt
       end
 
       view_path = @scope.instance_variable_get('@_jbuilder_view_path')
-      template = ::Tilt::JbuilderTemplate.new(fetch_partial_path(options[:partial].to_s, view_path), nil, view_path: view_path)
+
+      if GJ_TILT_CACHE.nil?
+        template = ::Tilt::JbuilderTemplate.new(fetch_partial_path(options[:partial].to_s, view_path), nil, view_path: view_path)
+      else
+        paritial_path = fetch_partial_path(options[:partial].to_s, view_path)
+        template = GJ_TILT_CACHE.fetch(paritial_path, nil, view_path: view_path)
+      end
       render_partial_with_options template, options
     end
 
